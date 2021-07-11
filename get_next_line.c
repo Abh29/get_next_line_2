@@ -14,7 +14,7 @@ static int	ft_handle_rest(char **line, char **rest)
 			*line = ft_strdup(*rest);
 			ln = ft_strdup(ln + 1);
 			free(*rest);
-			getchar();
+			*rest = NULL;
 			if (*ln)
 				*rest = ft_strdup(ln);
 			free(ln);
@@ -38,14 +38,21 @@ static int	ft_hahdnle_new_read(char *buff, char **line, char **rest)
 	if (nl)
 	{
 		*nl = 0;
-		*rest = ft_strdup(nl + 1);
+		if (*(nl + 1))
+			*rest = ft_strdup(nl + 1);
 		nl = NULL;
 		out = 1;
 	}
 	if (*line == NULL)
 		*line = ft_strdup(buff);
 	else
-		*line = ft_strjoin(*line, buff);
+	{
+		nl = ft_strdup(*line);
+		free(*line);
+		*line = ft_strjoin(nl, buff);
+		free(nl);
+		nl = NULL;
+	}
 	return (out);
 }
 
@@ -54,29 +61,21 @@ char	*get_next_line(int fd)
 	static char		*rest;
 	int				size;
 	char			*line;
-	char			*buff;
+	char			buff[BUFFER_SIZE + 1];
 
-	//printf("this is the rest %s", rest);
-	//getchar();
 	if (BUFFER_SIZE < 1)
 		return (NULL);
 	line = NULL;
 	if (ft_handle_rest(&line, &rest))
 		return (line);
-	buff = malloc (BUFFER_SIZE + 1);
-	if (buff == NULL)
-		return (NULL);
-	while (1)
+	*buff = 0;
+	size = read(fd, buff, BUFFER_SIZE);
+	while (size > 0)
 	{
-		size = read(fd, buff, BUFFER_SIZE);
-		//printf("this is size %d\n", size);
-		if (size <= 0)
-			break ;
 		buff[size] = 0;
-		if (ft_hahdnle_new_read(buff, &line, &rest) || size < BUFFER_SIZE)
+		if (ft_hahdnle_new_read(buff, &line, &rest))
 			break ;
+		size = read(fd, buff, BUFFER_SIZE);
 	}
-	free(buff);
-	buff = NULL;
 	return (line);
 }
