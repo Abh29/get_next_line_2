@@ -1,6 +1,15 @@
 #include "get_next_line.h"
 #include <stdio.h>
 
+static void	ft_add_nl(char **line)
+{
+	char	*tmp;
+
+	tmp = ft_strjoin(*line, "\n");
+	free(*line);
+	*line = tmp;
+}
+
 static int	ft_handle_rest(char **line, char **rest)
 {
 	char	*ln;
@@ -19,6 +28,7 @@ static int	ft_handle_rest(char **line, char **rest)
 				*rest = ft_strdup(ln);
 			free(ln);
 			ln = NULL;
+			ft_add_nl(line);
 			return (1);
 		}
 		*line = ft_strdup(*rest);
@@ -49,6 +59,7 @@ static int	ft_hahdnle_new_read(char *buff, char **line, char **rest)
 	{
 		nl = ft_strdup(*line);
 		free(*line);
+		*line = NULL;
 		*line = ft_strjoin(nl, buff);
 		free(nl);
 		nl = NULL;
@@ -74,7 +85,10 @@ char	*get_next_line(int fd)
 	{
 		buff[size] = 0;
 		if (ft_hahdnle_new_read(buff, &line, &rest))
+		{
+			ft_add_nl(&line);
 			break ;
+		}
 		size = read(fd, buff, BUFFER_SIZE);
 	}
 	return (line);
