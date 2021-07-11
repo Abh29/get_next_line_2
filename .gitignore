@@ -2,6 +2,10 @@ Makefile
 test.c
 test.txt
 nextLine
+42*
+gnl*
+test*
+tst*
 
 # Prerequisites
 *.d
