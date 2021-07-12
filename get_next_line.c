@@ -67,29 +67,41 @@ static int	ft_hahdnle_new_read(char *buff, char **line, char **rest)
 	return (out);
 }
 
+static int	ft_part_two(int fd, char **line, char **rest)
+{
+	char	*buff;
+	int		size;
+
+	buff = malloc(BUFFER_SIZE + 1);
+	if (buff == NULL)
+		return (0);
+	size = read(fd, buff, BUFFER_SIZE);
+	while (size > 0)
+	{
+		buff[size] = 0;
+		if (ft_hahdnle_new_read(buff, line, rest))
+		{
+			ft_add_nl(line);
+			break ;
+		}
+		size = read(fd, buff, BUFFER_SIZE);
+	}
+	free(buff);
+	buff = NULL;
+	return (1);
+}
+
 char	*get_next_line(int fd)
 {
 	static char		*rest;
-	int				size;
 	char			*line;
-	char			buff[BUFFER_SIZE + 1];
 
 	if (BUFFER_SIZE < 1)
 		return (NULL);
 	line = NULL;
 	if (ft_handle_rest(&line, &rest))
 		return (line);
-	*buff = 0;
-	size = read(fd, buff, BUFFER_SIZE);
-	while (size > 0)
-	{
-		buff[size] = 0;
-		if (ft_hahdnle_new_read(buff, &line, &rest))
-		{
-			ft_add_nl(&line);
-			break ;
-		}
-		size = read(fd, buff, BUFFER_SIZE);
-	}
-	return (line);
+	if (ft_part_two(fd, &line, &rest))
+		return (line);
+	return (NULL);
 }

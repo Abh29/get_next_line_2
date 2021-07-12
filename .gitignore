@@ -6,6 +6,10 @@ nextLine
 gnl*
 test*
 tst*
+.vscode
+.dist
+
+
 
 # Prerequisites
 *.d
